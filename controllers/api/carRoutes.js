@@ -1,24 +1,21 @@
 const router = require("express").Router();
-const { Car, Location } = require("../../models");
+
+const { Car } = require("../../models");
+const withAuth = require("../../utils/auth");
 
 router.get("/", async (req, res) => {
   try {
     const carData = await Car.findAll({
-      include: [
-        {
-          model: Location,
-          attributes: ["country"],
-        },
-      ],
+      include: [Location],
     });
-    console.log(carData);
+
     res.status(200).json(carData);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", withAuth, async (req, res) => {
   try {
     const newCar = await Car.create({
       ...req.body,
@@ -31,7 +28,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", withAuth, async (req, res) => {
   try {
     const carData = await Car.destroy({
       where: {
